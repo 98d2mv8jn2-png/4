@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>一鍵下載乘車收費表</title>
+</head>
+<body style="font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; background-color: #f0f4f8;">
+
+  <div style="background: white; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;">
+    <h2 style="color: #1a365d; margin-top: 0;">9/4-9/6 乘車收費明細表</h2>
+    <p style="color: #4a5568; margin-bottom: 25px;">點擊下方按鈕即可直接下載可直接開啟的排版檔案（已內建自動列印與另存 PDF 功能）。</p>
+    <button id="downloadBtn" style="background-color: #2b6cb0; color: white; border: none; padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s;">
+      📥 立即下載收費明細表
+    </button>
+  </div>
+
+<script>
+const htmlContent = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>9/4-9/6 返鄉返校乘車收費明細表</title>
+    <style>
+        @page { size: A4; margin: 12mm 10mm; }
+        body { font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif; color: #333; line-height: 1.35; font-size: 12px; margin: 0; padding: 0; }
+        .header { text-align: center; margin-bottom: 12px; }
+        h1 { font-size: 18px; margin: 0 0 4px 0; color: #1a365d; }
+        .subtitle { font-size: 11px; color: #666; }
+        .summary-box { display: flex; justify-content: space-around; background-color: #f7fafc; border: 1px solid #cbd5e0; padding: 8px; border-radius: 5px; margin-bottom: 12px; }
+        .summary-item { font-size: 12px; }
+        .summary-item strong { color: #2b6cb0; }
+        .section-title { background-color: #2b6cb0; color: white; padding: 3px 8px; font-size: 12px; font-weight: bold; border-radius: 3px 3px 0 0; margin-top: 10px; display: flex; justify-content: space-between; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+        th, td { border: 1px solid #cbd5e0; padding: 4px 6px; font-size: 11px; }
+        th { background-color: #edf2f7; color: #4a5568; font-weight: bold; text-align: center; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .amount { font-weight: bold; color: #c53030; }
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .full-width { grid-column: span 2; }
+        .print-btn-bar { text-align: center; margin-bottom: 15px; }
+        .print-btn { background: #2b6cb0; color: white; border: none; padding: 8px 20px; font-size: 14px; border-radius: 4px; cursor: pointer; }
+        @media print {
+            .print-btn-bar { display: none; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-break { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-btn-bar">
+        <button class="print-btn" onclick="window.print()">🖨️ 列印 / 另存為 PDF</button>
+    </div>
+    <div class="header">
+        <h1>9/4 返鄉 & 9/6 返校 專車乘車收費明細總表</h1>
+        <div class="subtitle">費用標準：【返鄉】台中 $210 / 嘉義 $330 / 台南 $420 / 高雄 $490 ｜ 【返校】台中 $220 / 嘉義 $340 / 台南 $430 / 高雄 $510</div>
+    </div>
+    <div class="summary-box">
+        <div class="summary-item"><strong>9/4 返鄉總計：</strong>91 員 / $29,520 元</div>
+        <div class="summary-item"><strong>9/6 返校總計：</strong>100 員 / $34,080 元</div>
+        <div class="summary-item"><strong>全體應收總額：</strong><span style="color:#c53030; font-weight:bold; font-size:13px;">$63,600 元</span></div>
+    </div>
+    <div class="grid-container">
+        <div class="no-break">
+            <div class="section-title"><span>軍正班</span><span>小計：$1,980 元</span></div>
+            <table>
+                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
+                <tr><td class="text-center">鄧莉婷</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">林芸宜</td><td>嘉義 ($330)</td><td>台中 ($220)</td><td class="text-right amount">$550</td></tr>
+                <tr><td class="text-center">陳冠諭</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+            </table>
+        </div>
+        <div class="no-break">
+            <div class="section-title"><span>大客車 學員隊</span><span>小計：$2,000 元</span></div>
+            <table>
+                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
+                <tr><td class="text-center">劉高維</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">傅子承</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+            </table>
+        </div>
+        <div class="no-break">
+            <div class="section-title"><span>財務士高班 學員隊</span><span>小計：$2,920 元</span></div>
+            <table>
+                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
+                <tr><td class="text-center">游文惠</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
+                <tr><td class="text-center">吳宜茹</td><td>台中 ($210)</td><td>台南 ($430)</td><td class="text-right amount">$640</td></tr>
+                <tr><td class="text-center">陳宜青</td><td>台中 ($210)</td><td>高雄 ($510)</td><td class="text-right amount">$720</td></tr>
+                <tr><td class="text-center">楊宗浡</td><td>台南 ($420)</td><td>台南 ($430)</td><td class="text-right amount">$850</td></tr>
+                <tr><td class="text-center">蔡宗翰</td><td>高雄 ($490)</td><td>-</td><td class="text-right amount">$490</td></tr>
+            </table>
+        </div>
+        <div class="no-break">
+            <div class="section-title"><span>衛勤士高班 學員隊</span><span>小計：$3,510 元</span></div>
+            <table>
+                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
+                <tr><td class="text-center">黃嘉明</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">劉駿甫</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">胡宏聰</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">顏綾</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
+            </table>
+        </div>
+        <div class="no-break">
+            <div class="section-title"><span>義務役班隊 一中隊</span><span>小計：$2,190 元</span></div>
+            <table>
+                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
+                <tr><td class="text-center">吳洛霆</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
+                <tr><td class="text-center">謝逢恩</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
+                <tr><td class="text-center">曾翊勛</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
+                <tr><td class="text-center">蕭嶸哲</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">吳奕葳</td><td>台中 ($210)</td><td>嘉義 ($340)</td><td class="text-right amount">$550</td></tr>
+                <tr><td class="text-center">蕭勝耀</td><td>台中 ($210)</td><td>嘉義 ($340)</td><td class="text-right amount">$550</td></tr>
+            </table>
+        </div>
+        <div class="no-break">
+            <div class="section-title"><span>聯結車 學員隊</span><span>小計：$6,060 元</span></div>
+            <table>
+                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
+                <tr><td class="text-center">葉宥綸</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">陳昀瑋</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">吳燕木</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">朱品綸</td><td>台南 ($420)</td><td>台南 ($430)</td><td class="text-right amount">$850</td></tr>
+                <tr><td class="text-center">吳駿逸</td><td>-</td><td>台南 ($430)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">潘柏穎</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">張淳閔</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">鍾旻修</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
+                <tr><td class="text-center">高鵬</td><td>高雄 ($490)</td><td>-</td><td class="text-right amount">$490</td></tr>
+                <tr><td class="text-center">洪義傑</td><td>高雄 ($490)</td><td>-</td><td class="text-right amount">$490</td></tr>
+            </table>
+        </div>
+        <div class="no-break">
+            <div class="section-title"><span>士高運輸 學員隊</span><span>小計：$4,840 元</span></div>
+            <table>
+                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
+                <tr><td class="text-center">陳冠達</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">周清允</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">邢若昀</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">陳仕偉</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">廖俊瑋</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
+                <tr><td class="text-center">巴志文</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
+                <tr><td class="text-center">王慧琳</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
+                <tr><td class="text-center">許忠浩</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
+                <tr><td class="text-center">林柏凱</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
+            </table>
+        </div>
+        <div class="no-break">
+            <div class="section-title"><span>補給士高 學員中隊</span><span>小計：$9,720 元</span></div>
+            <table>
+                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
+                <tr><td class="text-center">王忠仁</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">陳建文</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">王朝右</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">巫旻儒</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">蔡曜聰</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">林子益</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">陳明志</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">李映承</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">邱崇偉</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">李健志</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">鄭孝恆</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">蔡柏綸</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+            </table>
+        </div>
+        <div class="no-break full-width">
+            <div class="section-title"><span>志兵運輸兵班 二中隊</span><span>小計：$10,860 元</span></div>
+            <table>
+                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
+                <tr><td class="text-center">施育倫</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">詹梓毅</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">陳胤勳</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">謝慧盈</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">呂昆學</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">蔡宜甄</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">潘銘豪</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">黃品睿</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">李孟德</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">廖翊閔</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">郭柏辰</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">周益呈</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">洪柏翔</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">郭士榮</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">文聖宗</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">全駿麟</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
+                <tr><td class="text-center">朱彥螢</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">邱鉦淯</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td></tr>
+                <tr><td class="text-center">邱瀚緯</td><td>嘉義 ($330)</td><td>-</td><td class="text-right amount">$330</td><td class="text-center">張雅綸</td><td>台南 ($420)</td><td>台南 ($430)</td><td class="text-right amount">$850</td></tr>
+                <tr><td class="text-center">朱辰軒</td><td>台南 ($420)</td><td>-</td><td class="text-right amount">$420</td><td class="text-center">潘品荃</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">陳志諧</td><td>高雄 ($490)</td><td>-</td><td class="text-right amount">$490</td><td colspan="4"></td></tr>
+            </table>
+        </div>
+        <div class="no-break full-width">
+            <div class="section-title"><span>志役補給 115-5 一中隊</span><span>小計：$19,520 元</span></div>
+            <table>
+                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
+                <tr><td class="text-center">陳維弘</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">陳怡因</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">廖顯侑</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">許祐誠</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">劉致廷</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">黃俊珽</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">許智威</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">蘇婉婷</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">陳鎧維</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">吳幼茗</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">楊雅茜</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">許靖婉</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
+                <tr><td class="text-center">沈健瑋</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">陳彥豪</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
+                <tr><td class="text-center">劉塍垵</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">林裕欽</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
+                <tr><td class="text-center">陳秦翊</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">蘇慧昌</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td></tr>
+                <tr><td class="text-center">楊彩慈</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">劉弘鈞</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td></tr>
+                <tr><td class="text-center">施怡禎</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td><td class="text-center">曾惠溱</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">王亮臻</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td><td class="text-center">郭妮宸</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">黃聖傑</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td><td class="text-center">錢煜廷</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">張家烽</td><td>台南 ($420)</td><td>台南 ($430)</td><td class="text-right amount">$850</td><td class="text-center">吳仲桓</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">孔顴中</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td><td class="text-center">徐聖超</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+                <tr><td class="text-center">邵韋嘉</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td><td class="text-center">陳亭蓁</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>`;
+
+document.getElementById('downloadBtn').addEventListener('click', function() {
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '9月4日_9月6日專車乘車收費明細表.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
