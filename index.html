@@ -1,220 +1,1201 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<title>一鍵下載乘車收費表</title>
-</head>
-<body style="font-family: 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; background-color: #f0f4f8;">
-
-  <div style="background: white; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;">
-    <h2 style="color: #1a365d; margin-top: 0;">9/4-9/6 乘車收費明細表</h2>
-    <p style="color: #4a5568; margin-bottom: 25px;">點擊下方按鈕即可直接下載可直接開啟的排版檔案（已內建自動列印與另存 PDF 功能）。</p>
-    <button id="downloadBtn" style="background-color: #2b6cb0; color: white; border: none; padding: 12px 28px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s;">
-      📥 立即下載收費明細表
-    </button>
-  </div>
-
-<script>
-const htmlContent = `<!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>9/4-9/6 返鄉返校乘車收費明細表</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>財務士高班第三階段測驗系統</title>
     <style>
-        @page { size: A4; margin: 12mm 10mm; }
-        body { font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif; color: #333; line-height: 1.35; font-size: 12px; margin: 0; padding: 0; }
-        .header { text-align: center; margin-bottom: 12px; }
-        h1 { font-size: 18px; margin: 0 0 4px 0; color: #1a365d; }
-        .subtitle { font-size: 11px; color: #666; }
-        .summary-box { display: flex; justify-content: space-around; background-color: #f7fafc; border: 1px solid #cbd5e0; padding: 8px; border-radius: 5px; margin-bottom: 12px; }
-        .summary-item { font-size: 12px; }
-        .summary-item strong { color: #2b6cb0; }
-        .section-title { background-color: #2b6cb0; color: white; padding: 3px 8px; font-size: 12px; font-weight: bold; border-radius: 3px 3px 0 0; margin-top: 10px; display: flex; justify-content: space-between; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-        th, td { border: 1px solid #cbd5e0; padding: 4px 6px; font-size: 11px; }
-        th { background-color: #edf2f7; color: #4a5568; font-weight: bold; text-align: center; }
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .amount { font-weight: bold; color: #c53030; }
-        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .full-width { grid-column: span 2; }
-        .print-btn-bar { text-align: center; margin-bottom: 15px; }
-        .print-btn { background: #2b6cb0; color: white; border: none; padding: 8px 20px; font-size: 14px; border-radius: 4px; cursor: pointer; }
-        @media print {
-            .print-btn-bar { display: none; }
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .no-break { page-break-inside: avoid; }
+        :root {
+            --primary: #1e3a8a;
+            --primary-hover: #1d4ed8;
+            --success: #15803d;
+            --danger: #b91c1c;
+            --warning: #d97706;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 680px;
+            padding: 2rem;
+        }
+        h1 { font-size: 1.35rem; color: var(--primary); margin-bottom: 1.5rem; text-align: center; }
+        .setup-group { margin-bottom: 1.25rem; }
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        select, input[type="number"], textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            background-color: #fff;
+            transition: border-color 0.2s;
+        }
+        select:focus, input[type="number"]:focus, textarea:focus { border-color: var(--primary); }
+        textarea { resize: vertical; min-height: 120px; font-family: inherit; }
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .grid-item label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+        .range-inputs {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .range-inputs input { width: 50%; }
+        .total-hint {
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn:disabled { background-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+        .btn-warning { background-color: var(--warning); }
+        .btn-warning:hover { background-color: #b45309; }
+        .btn-secondary { background-color: #64748b; }
+        .btn-secondary:hover { background-color: #475569; }
+        .btn-success { background-color: var(--success); }
+        .btn-success:hover { background-color: #166534; }
+        .btn-skip {
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid var(--border);
+        }
+        .btn-skip:hover { background-color: #e2e8f0; color: #0f172a; }
+        .btn-group { display: flex; flex-direction: column; gap: 0.75rem; }
+        .quiz-btn-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            background-color: #dbeafe;
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+        .quiz-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .quiz-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .mastered-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+        .mastered-toggle input { cursor: pointer; width: 16px; height: 16px; }
+        .mastered-info-badge {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .mastered-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .btn-text-sm {
+            background: none;
+            border: none;
+            color: #0284c7;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0;
+        }
+        .btn-text-sm:hover { color: #0369a1; }
+        .btn-text-danger { color: #dc2626; }
+        .btn-text-danger:hover { color: #991b1b; }
+        
+        .pause-banner {
+            background-color: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .pause-title {
+            font-weight: bold;
+            color: #92400e;
+            font-size: 0.95rem;
+        }
+        .pause-desc {
+            font-size: 0.85rem;
+            color: #78350f;
+        }
+        .pause-btns {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .question-box { font-size: 1.15rem; font-weight: 600; margin-bottom: 1.25rem; line-height: 1.6; }
+        .feedback { margin-top: 1.25rem; padding: 1rem; border-radius: 6px; }
+        .feedback.correct { background-color: #dcfce7; border: 1px solid #bbf7d0; color: var(--success); }
+        .feedback.wrong { background-color: #fee2e2; border: 1px solid #fecaca; color: var(--danger); }
+        .feedback-title { font-weight: bold; font-size: 1.05rem; margin-bottom: 0.5rem; }
+        .diff-view { background: #fff; border: 1px solid var(--border); padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem; font-size: 0.95rem; line-height: 1.6; color: var(--text); word-break: break-all; }
+        .diff-del { background-color: #fecaca; color: #991b1b; text-decoration: line-through; padding: 0 2px; }
+        .diff-ins { background-color: #fed7aa; color: #9a3412; font-weight: bold; padding: 0 2px; }
+        .stat-card { background-color: #f1f5f9; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center; }
+        .stat-rate { font-size: 2rem; font-weight: bold; color: var(--primary); margin: 0.5rem 0; }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .filter-tab {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: #fff;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .filter-tab.active {
+            background-color: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .mastered-list {
+            max-height: 60vh;
+            overflow-y: auto;
+            margin: 0.5rem 0 1rem 0;
+            padding-right: 0.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .mastered-item-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+        .mastered-item-card.is-mastered {
+            border-color: #93c5fd;
+            background-color: #f8fafc;
+        }
+        .mastered-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .diff-tag {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .diff-tag-easy { background-color: #dcfce7; color: #166534; }
+        .diff-tag-mid { background-color: #fef3c7; color: #92400e; }
+        .diff-tag-hard { background-color: #fee2e2; color: #991b1b; }
+        .mastered-item-q {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            line-height: 1.5;
+        }
+        .mastered-item-a {
+            font-size: 0.95rem;
+            color: #334155;
+            background-color: #f8fafc;
+            padding: 0.6rem;
+            border-radius: 4px;
+            line-height: 1.5;
+            border-left: 3px solid var(--primary);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* 90題全熟記彈窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 1.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-card {
+            background: #ffffff;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 100%;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            animation: popUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-icon {
+            font-size: 4rem;
+            line-height: 1;
+            margin-bottom: 1rem;
+            animation: bounce 1.2s infinite alternate ease-in-out;
+        }
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #b45309;
+            margin-bottom: 0.75rem;
+            letter-spacing: 1px;
+        }
+        .modal-desc {
+            font-size: 1.05rem;
+            color: #334155;
+            line-height: 1.6;
+            margin-bottom: 1.75rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes popUp {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes bounce {
+            from { transform: translateY(0px) scale(1); }
+            to { transform: translateY(-8px) scale(1.08); }
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="print-btn-bar">
-        <button class="print-btn" onclick="window.print()">🖨️ 列印 / 另存為 PDF</button>
-    </div>
-    <div class="header">
-        <h1>9/4 返鄉 & 9/6 返校 專車乘車收費明細總表</h1>
-        <div class="subtitle">費用標準：【返鄉】台中 $210 / 嘉義 $330 / 台南 $420 / 高雄 $490 ｜ 【返校】台中 $220 / 嘉義 $340 / 台南 $430 / 高雄 $510</div>
-    </div>
-    <div class="summary-box">
-        <div class="summary-item"><strong>9/4 返鄉總計：</strong>91 員 / $29,520 元</div>
-        <div class="summary-item"><strong>9/6 返校總計：</strong>100 員 / $34,080 元</div>
-        <div class="summary-item"><strong>全體應收總額：</strong><span style="color:#c53030; font-weight:bold; font-size:13px;">$63,600 元</span></div>
-    </div>
-    <div class="grid-container">
-        <div class="no-break">
-            <div class="section-title"><span>軍正班</span><span>小計：$1,980 元</span></div>
-            <table>
-                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
-                <tr><td class="text-center">鄧莉婷</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">林芸宜</td><td>嘉義 ($330)</td><td>台中 ($220)</td><td class="text-right amount">$550</td></tr>
-                <tr><td class="text-center">陳冠諭</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-            </table>
-        </div>
-        <div class="no-break">
-            <div class="section-title"><span>大客車 學員隊</span><span>小計：$2,000 元</span></div>
-            <table>
-                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
-                <tr><td class="text-center">劉高維</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">傅子承</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-            </table>
-        </div>
-        <div class="no-break">
-            <div class="section-title"><span>財務士高班 學員隊</span><span>小計：$2,920 元</span></div>
-            <table>
-                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
-                <tr><td class="text-center">游文惠</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
-                <tr><td class="text-center">吳宜茹</td><td>台中 ($210)</td><td>台南 ($430)</td><td class="text-right amount">$640</td></tr>
-                <tr><td class="text-center">陳宜青</td><td>台中 ($210)</td><td>高雄 ($510)</td><td class="text-right amount">$720</td></tr>
-                <tr><td class="text-center">楊宗浡</td><td>台南 ($420)</td><td>台南 ($430)</td><td class="text-right amount">$850</td></tr>
-                <tr><td class="text-center">蔡宗翰</td><td>高雄 ($490)</td><td>-</td><td class="text-right amount">$490</td></tr>
-            </table>
-        </div>
-        <div class="no-break">
-            <div class="section-title"><span>衛勤士高班 學員隊</span><span>小計：$3,510 元</span></div>
-            <table>
-                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
-                <tr><td class="text-center">黃嘉明</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">劉駿甫</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">胡宏聰</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">顏綾</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
-            </table>
-        </div>
-        <div class="no-break">
-            <div class="section-title"><span>義務役班隊 一中隊</span><span>小計：$2,190 元</span></div>
-            <table>
-                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
-                <tr><td class="text-center">吳洛霆</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
-                <tr><td class="text-center">謝逢恩</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
-                <tr><td class="text-center">曾翊勛</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
-                <tr><td class="text-center">蕭嶸哲</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">吳奕葳</td><td>台中 ($210)</td><td>嘉義 ($340)</td><td class="text-right amount">$550</td></tr>
-                <tr><td class="text-center">蕭勝耀</td><td>台中 ($210)</td><td>嘉義 ($340)</td><td class="text-right amount">$550</td></tr>
-            </table>
-        </div>
-        <div class="no-break">
-            <div class="section-title"><span>聯結車 學員隊</span><span>小計：$6,060 元</span></div>
-            <table>
-                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
-                <tr><td class="text-center">葉宥綸</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">陳昀瑋</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">吳燕木</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">朱品綸</td><td>台南 ($420)</td><td>台南 ($430)</td><td class="text-right amount">$850</td></tr>
-                <tr><td class="text-center">吳駿逸</td><td>-</td><td>台南 ($430)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">潘柏穎</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">張淳閔</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">鍾旻修</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
-                <tr><td class="text-center">高鵬</td><td>高雄 ($490)</td><td>-</td><td class="text-right amount">$490</td></tr>
-                <tr><td class="text-center">洪義傑</td><td>高雄 ($490)</td><td>-</td><td class="text-right amount">$490</td></tr>
-            </table>
-        </div>
-        <div class="no-break">
-            <div class="section-title"><span>士高運輸 學員隊</span><span>小計：$4,840 元</span></div>
-            <table>
-                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
-                <tr><td class="text-center">陳冠達</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">周清允</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">邢若昀</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">陳仕偉</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">廖俊瑋</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
-                <tr><td class="text-center">巴志文</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
-                <tr><td class="text-center">王慧琳</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
-                <tr><td class="text-center">許忠浩</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
-                <tr><td class="text-center">林柏凱</td><td>-</td><td>高雄 ($510)</td><td class="text-right amount">$510</td></tr>
-            </table>
-        </div>
-        <div class="no-break">
-            <div class="section-title"><span>補給士高 學員中隊</span><span>小計：$9,720 元</span></div>
-            <table>
-                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
-                <tr><td class="text-center">王忠仁</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">陳建文</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">王朝右</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">巫旻儒</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">蔡曜聰</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">林子益</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">陳明志</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">李映承</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">邱崇偉</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">李健志</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">鄭孝恆</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">蔡柏綸</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-            </table>
-        </div>
-        <div class="no-break full-width">
-            <div class="section-title"><span>志兵運輸兵班 二中隊</span><span>小計：$10,860 元</span></div>
-            <table>
-                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
-                <tr><td class="text-center">施育倫</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">詹梓毅</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">陳胤勳</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">謝慧盈</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">呂昆學</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">蔡宜甄</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">潘銘豪</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">黃品睿</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">李孟德</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">廖翊閔</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">郭柏辰</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">周益呈</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">洪柏翔</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">郭士榮</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">文聖宗</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">全駿麟</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
-                <tr><td class="text-center">朱彥螢</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">邱鉦淯</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td></tr>
-                <tr><td class="text-center">邱瀚緯</td><td>嘉義 ($330)</td><td>-</td><td class="text-right amount">$330</td><td class="text-center">張雅綸</td><td>台南 ($420)</td><td>台南 ($430)</td><td class="text-right amount">$850</td></tr>
-                <tr><td class="text-center">朱辰軒</td><td>台南 ($420)</td><td>-</td><td class="text-right amount">$420</td><td class="text-center">潘品荃</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">陳志諧</td><td>高雄 ($490)</td><td>-</td><td class="text-right amount">$490</td><td colspan="4"></td></tr>
-            </table>
-        </div>
-        <div class="no-break full-width">
-            <div class="section-title"><span>志役補給 115-5 一中隊</span><span>小計：$19,520 元</span></div>
-            <table>
-                <tr><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th><th>姓名</th><th>9/4 返鄉</th><th>9/6 返校</th><th class="text-right">應繳</th></tr>
-                <tr><td class="text-center">陳維弘</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">陳怡因</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">廖顯侑</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">許祐誠</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">劉致廷</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">黃俊珽</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">許智威</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">蘇婉婷</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">陳鎧維</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">吳幼茗</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">楊雅茜</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">許靖婉</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td></tr>
-                <tr><td class="text-center">沈健瑋</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">陳彥豪</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
-                <tr><td class="text-center">劉塍垵</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">林裕欽</td><td>-</td><td>台中 ($220)</td><td class="text-right amount">$220</td></tr>
-                <tr><td class="text-center">陳秦翊</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">蘇慧昌</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td></tr>
-                <tr><td class="text-center">楊彩慈</td><td>台中 ($210)</td><td>台中 ($220)</td><td class="text-right amount">$430</td><td class="text-center">劉弘鈞</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td></tr>
-                <tr><td class="text-center">施怡禎</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td><td class="text-center">曾惠溱</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">王亮臻</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td><td class="text-center">郭妮宸</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">黃聖傑</td><td>嘉義 ($330)</td><td>嘉義 ($340)</td><td class="text-right amount">$670</td><td class="text-center">錢煜廷</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">張家烽</td><td>台南 ($420)</td><td>台南 ($430)</td><td class="text-right amount">$850</td><td class="text-center">吳仲桓</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">孔顴中</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td><td class="text-center">徐聖超</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-                <tr><td class="text-center">邵韋嘉</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td><td class="text-center">陳亭蓁</td><td>高雄 ($490)</td><td>高雄 ($510)</td><td class="text-right amount">$1,000</td></tr>
-            </table>
-        </div>
-    </div>
-</body>
-</html>`;
 
-document.getElementById('downloadBtn').addEventListener('click', function() {
-    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = '9月4日_9月6日專車乘車收費明細表.html';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-});
+<div class="container">
+    <!-- 設定畫面（主頁） -->
+    <div id="view-setup">
+        <h1>財務士高班第三階段測驗系統</h1>
+        
+        <div class="mastered-info-badge" id="mastered-badge">
+            <span id="mastered-stat-text">已標記熟記：0 題 / 共 90 題</span>
+            <div class="mastered-actions">
+                <button class="btn-text-sm" onclick="showMasteredList()">瀏覽總題庫 / 勾選熟記</button>
+                <button class="btn-text-sm btn-text-danger" onclick="resetMastered()">清空熟記</button>
+            </div>
+        </div>
+
+        <!-- 暫停進行中測驗的提示面板 -->
+        <div id="panel-paused-quiz" class="pause-banner hidden">
+            <div class="pause-title">📌 偵測到有尚未完成的測驗進度</div>
+            <div class="pause-desc" id="pause-status-desc">目前進度：第 1 題 / 共 30 題</div>
+            <div class="pause-btns">
+                <button class="btn btn-success" onclick="resumeQuiz()" style="font-size: 0.9rem; padding: 0.5rem 1rem;">▶️ 繼續未完成測驗</button>
+                <button class="btn btn-secondary" onclick="discardQuiz()" style="font-size: 0.9rem; padding: 0.5rem 1rem; background-color: #94a3b8;">放棄進度</button>
+            </div>
+        </div>
+
+        <div class="setup-group">
+            <label for="select-match-rule">答案判定方式：</label>
+            <select id="select-match-rule">
+                <option value="smart" selected>💡 寬鬆模式（要點字對即可，免編號標點、順序不拘）</option>
+                <option value="exact">🎯 嚴格模式（一字不漏，含編號/順序/標點；全半形皆可）</option>
+            </select>
+        </div>
+
+        <div class="setup-group">
+            <label for="select-mode">測驗模式：</label>
+            <select id="select-mode" onchange="handleModeChange()">
+                <option value="ratio" selected>依難易度配題（含熟記題，出現可跳過）</option>
+                <option value="all">全題庫隨機抽取（直接跳過已熟記題）</option>
+                <option value="custom">自訂指定範圍（直接跳過已熟記題）</option>
+            </select>
+        </div>
+
+        <!-- 難易度自訂配題面板 -->
+        <div id="panel-ratio" class="setup-group">
+            <label>設定各難度題數（預設 15 / 10 / 5）：</label>
+            <div class="grid-inputs">
+                <div class="grid-item">
+                    <label for="input-easy">易（上限 36）</label>
+                    <input type="number" id="input-easy" min="0" max="36" value="15" oninput="updateTotalCount()">
+                </div>
+                <div class="grid-item">
+                    <label for="input-mid">中（上限 36）</label>
+                    <input type="number" id="input-mid" min="0" max="36" value="10" oninput="updateTotalCount()">
+                </div>
+                <div class="grid-item">
+                    <label for="input-hard">難（上限 18）</label>
+                    <input type="number" id="input-hard" min="0" max="18" value="5" oninput="updateTotalCount()">
+                </div>
+            </div>
+            <div class="total-hint" id="ratio-total-hint">本次預計測驗：30 題</div>
+        </div>
+
+        <!-- 全題庫隨機抽取面板 -->
+        <div id="panel-count" class="setup-group hidden">
+            <label for="input-count" id="label-count">本次測驗題數（排除已熟記後共 90 題）：</label>
+            <input type="number" id="input-count" min="1" max="90" value="30">
+        </div>
+
+        <!-- 自訂題號區間面板 -->
+        <div id="panel-custom" class="setup-group hidden">
+            <label>指定題庫索引區間（將直接跳過區間內的已熟記題）：</label>
+            <div class="range-inputs">
+                <input type="number" id="custom-start" min="1" max="90" value="1" placeholder="起始題號">
+                <span>至</span>
+                <input type="number" id="custom-end" min="1" max="90" value="90" placeholder="結束題號">
+            </div>
+        </div>
+
+        <button class="btn" onclick="startNewQuizClick()" style="margin-top: 1rem;">開始測驗</button>
+    </div>
+
+    <!-- 查看總題庫與管理畫面 -->
+    <div id="view-mastered" class="hidden">
+        <h1>總題庫瀏覽與熟記管理</h1>
+        <div class="filter-tabs">
+            <button class="filter-tab active" id="tab-all" onclick="switchBankFilter('all')">全部 (90)</button>
+            <button class="filter-tab" id="tab-unmastered" onclick="switchBankFilter('unmastered')">僅未熟記</button>
+            <button class="filter-tab" id="tab-mastered" onclick="switchBankFilter('mastered')">僅已熟記</button>
+        </div>
+        <div id="mastered-list-container" class="mastered-list"></div>
+        <button class="btn btn-secondary" onclick="hideMasteredList()" style="margin-top: 1rem;">關閉並返回主頁</button>
+    </div>
+
+    <!-- 答題畫面 -->
+    <div id="view-quiz" class="hidden">
+        <div class="quiz-topbar">
+            <div class="status-badge" id="quiz-progress">第 1 題 / 共 30 題</div>
+            <div class="quiz-topbar-right">
+                <label class="mastered-toggle">
+                    <input type="checkbox" id="chk-mastered" onchange="toggleMastered(this.checked)">
+                    <span>這題我已背熟</span>
+                </label>
+                <button class="btn-text-sm" onclick="pauseAndGoHome()" style="font-weight: 600; color: #475569;">⏸️ 暫停回主頁</button>
+            </div>
+        </div>
+        
+        <div class="question-box" id="quiz-question"></div>
+        <textarea id="quiz-answer" placeholder="請輸入答案..." oninput="saveCurrentDraft(this.value)"></textarea>
+        
+        <div class="quiz-btn-actions">
+            <button class="btn btn-secondary" id="btn-prev" onclick="prevQuestion()" style="width: auto; min-width: 105px;">⬅️ 上一題</button>
+            <button class="btn btn-skip hidden" id="btn-skip" onclick="skipMasteredQuestion()">⏭️ 已熟記跳過</button>
+            <button class="btn" id="btn-submit" onclick="submitAnswer()">提交答案</button>
+            <button class="btn btn-success hidden" id="btn-next" onclick="nextQuestion()">下一題 ➡️</button>
+        </div>
+
+        <div id="quiz-feedback" class="feedback hidden"></div>
+    </div>
+
+    <!-- 結算畫面 -->
+    <div id="view-result" class="hidden">
+        <h1>測驗結算</h1>
+        <div class="stat-card">
+            <div>正確率</div>
+            <div class="stat-rate" id="res-rate">0%</div>
+            <div id="res-detail" style="color: var(--text-muted); font-size: 0.95rem;">實際作答 30 題 ｜ 答對 0 題 ｜ 答錯 0 題</div>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn btn-warning hidden" id="btn-retry-unmastered" onclick="startWrongReview()">複習本次錯題（僅未熟記）</button>
+            <button class="btn btn-secondary" onclick="restartQuiz()">重新設定 / 再次測驗</button>
+        </div>
+    </div>
+</div>
+
+<!-- 恭喜神功大成全螢幕彈窗 -->
+<div id="modal-all-mastered" class="modal-overlay hidden">
+    <div class="modal-card">
+        <div class="modal-icon">🎖️</div>
+        <div class="modal-title">恭喜神功大成！</div>
+        <div class="modal-desc">
+            太強了！您已將財務士高班第三階段測驗全數 <strong>90 題</strong> 題庫完全背熟！<br>
+            預祝士高班測驗旗開得勝、奪得佳績！
+        </div>
+        <button class="btn btn-warning" onclick="closeMasteredSuccessModal()" style="font-size: 1.05rem; padding: 0.85rem;">🏆 凱旋返回主頁</button>
+    </div>
+</div>
+
+<script>
+const RAW_QUESTIONS = [
+    // 🟢 易 (36題, id: 1~36)
+    { id: 1, diff: "easy", q: "為確保國軍基本防衛武力與發展所需軟、硬體設（施）備之各項費用係指何預算？", a: "軍事投資。" },
+    { id: 2, diff: "easy", q: "政府採購法所律定之「公告金額」額度為多少？", a: "150萬元。" },
+    { id: 3, diff: "easy", q: "支票印鑑應於何時加蓋？", a: "實際交付支票時。" },
+    { id: 4, diff: "easy", q: "國防部所屬各級單位主官及副主官行政費，上校及中校主官、副主官每月列支額度為何？", a: "（1）上校：6,600元。（2）中校：5,100元。" },
+    { id: 5, diff: "easy", q: "依國軍各級單位現金會計作業規定第30條，有關業務部門簽借墊借款應預定歸還期限，無論預算是否獲得，應於取得單據或任務結束後多少日內辦理核銷歸墊？", a: "30日內。" },
+    { id: 6, diff: "easy", q: "依軍費預算執行及支付結報規定第5項，預算分配區分哪二種？", a: "（1）計畫分配。（2）管制分配。" },
+    { id: 7, diff: "easy", q: "依國軍各單位預算簿籍憑證保管期限參照表，本島各機關學校憑證自總決算公布日起，保存幾年？", a: "2年。" },
+    { id: 8, diff: "easy", q: "依國軍各級單位現金會計作業第34條，單位伙食團申借副食週轉金時應記入何項會計科目？", a: "借入款。" },
+    { id: 9, diff: "easy", q: "單位弟兄之父親過世，其支付奠儀款項宜由何科目列支？", a: "主官行政費。" },
+    { id: 10, diff: "easy", q: "依國軍勞軍款處理作業規定，收支計畫應於收款幾日內完成計畫編製？", a: "10個工作日。" },
+    { id: 11, diff: "easy", q: "依國防部所屬單位會計檔案存管作業規定，各單位主官（職務代理人）對會計資料檔案與安全設備每月至少應檢查幾次？", a: "一次。" },
+    { id: 12, diff: "easy", q: "支票何處填寫錯誤不得塗改？", a: "金額大小寫。" },
+    { id: 13, diff: "easy", q: "本島一般部隊每月副食外購比例為副食費收入總額百分之幾？", a: "20%。" },
+    { id: 14, diff: "easy", q: "依會計法第53條，記帳憑證有那3種？", a: "收入傳票、支出傳票及轉帳傳票。" },
+    { id: 15, diff: "easy", q: "何謂主計人員？", a: "辦理單位主辦主計（會計）人員及所屬承辦主計事務人員謂之。" },
+    { id: 16, diff: "easy", q: "政府統計之調查、編製，全國統計總報告之編纂，統計辦法之統一，工作之分配，及業務之指導、監督，依何法規辦理？", a: "統計法。" },
+    { id: 17, diff: "easy", q: "已屆滿保管期限之會計檔案，經何單位核准銷毀計畫及目錄後即可辦理水銷作業？", a: "審計部。" },
+    { id: 18, diff: "easy", q: "單位各類所得扣繳暨免扣繳資料，應於何時前彙整向當地稽徵機關申報？", a: "應於每年1月底前完成作業。" },
+    { id: 19, diff: "easy", q: "依會計法第51條，為證明事項經過而造具記帳憑證所根據之憑證稱為？", a: "原始憑證。" },
+    { id: 20, diff: "easy", q: "獨立於總預算外之預算個體為何？", a: "特別預算。" },
+    { id: 21, diff: "easy", q: "依官兵薪餉自由選擇薪資存款業務金融機構計有那4家？", a: "郵局、土地銀行、合作金庫銀行及台新銀行。" },
+    { id: 22, diff: "easy", q: "為強化單位現金管理應於多久時間統計使用情形簽請主官重新核定櫃存現金限額？", a: "每半年。" },
+    { id: 23, diff: "easy", q: "國軍人員（現役官士兵、軍中文職、聘雇人員）之薪俸、加給、主副食費、保險及撫卹等各項費用係指何預算？", a: "人員維持。" },
+    { id: 24, diff: "easy", q: "內部審核區分為？", a: "事前審核及事後複核。" },
+    { id: 25, diff: "easy", q: "維持國軍單位一般基本行政運作所需之各項費用係指何預算？", a: "作業維持。" },
+    { id: 26, diff: "easy", q: "依國軍各級單位額定零用金作業規定，國防經費零用金每筆支出上限，額度為多少？", a: "2萬。" },
+    { id: 27, diff: "easy", q: "依會計法第51條，何謂記帳憑證？述明之。", a: "謂證明處理會計事項人員之責任而為記帳所根據之憑證。" },
+    { id: 28, diff: "easy", q: "依國防部所屬各級單位辦理國庫機關專戶存款網路銀行業務應行注意事項，各單位運用網路銀行轉帳交易至少律定哪四層以上之作業控管機制，並簽奉單位主官核定？", a: "（1）編輯（出納）。（2）審核（會計）。（3）核定（主計主管）。（4）放行（主官）。" },
+    { id: 29, diff: "easy", q: "依政府採購法第18條，採購之招標方式有那幾種？", a: "（1）公開招標。（2）選擇性招標。（3）限制性招標。" },
+    { id: 30, diff: "easy", q: "試問國軍各級單位定額業務費給與調整要件？", a: "（1）主官（管）編階異動。（2）編制員額調整。（3）任務調整。" },
+    { id: 31, diff: "easy", q: "單位櫃存現金、支票、有價證券或貴重物品財產，應存置於不易移動之保險櫃，保險櫃應靠近出納人員，並以幾道以上上鎖機制管制？", a: "2道以上。" },
+    { id: 32, diff: "easy", q: "櫃存現金上限額度由何人律定？", a: "單位主官。" },
+    { id: 33, diff: "easy", q: "何謂歲出預算？", a: "稱歲出者，謂一個會計年度之一切支出。但不包括債務之償還。" },
+    { id: 34, diff: "easy", q: "代收款收支計畫編製作業，當年度之收支計畫最遲應於何時經權責單位核定？", a: "會計年度終了前。" },
+    { id: 35, diff: "easy", q: "國軍人員誤餐費報支條件？", a: "應符合「執行臨時性公務」及「無法於伙食團用膳」等2項要求。" },
+    { id: 36, diff: "easy", q: "數個機關、計畫或科目共同分攤之支付款項，其支出憑證不能分割者，應檢附何種文件？", a: "支出機關（科目）分攤表。" },
+
+    // 🟡 中 (36題, id: 37~72)
+    { id: 37, diff: "mid", q: "年度考績獎金發放對象為何？", a: "（1）國軍志願役官兵考績年度內任職服勤滿6個月以上。（2）考績績等合於發給獎金規範。" },
+    { id: 38, diff: "mid", q: "歲入預算收入款項應繳金額，如不能一次繳清時，應如何辦理？", a: "得由填製單位於收入憑單附記欄內填註應繳總額及原因後，先按實收金額送繳，爾後分次補繳時，不須檢附文件。" },
+    { id: 39, diff: "mid", q: "國防部所屬各級單位主官及副主官行政費，動支對象為何？", a: "各級部隊、機關單位指揮官、副指揮官及中校以上主官、副主官等。" },
+    { id: 40, diff: "mid", q: "依國軍各級單位現金會計作業規定，會計報告區分那些？", a: "（1）日報：現金結存日報表。（2）月報：平衡表、總分類帳各明細分類帳科目餘額明細表、現金餘額分析表。" },
+    { id: 41, diff: "mid", q: "何謂甲種財務代理人？", a: "財務單位在特殊情況下，得應預算支用單位之請求，臨時指派財務官於指定地點辦理費款支付事宜者。" },
+    { id: 42, diff: "mid", q: "依強化基層部隊財務管理內部控制具體作法，主計部門對預財組之檢查，除應依「群（營、連）級單位自我檢查督檢項目」逐項檢核外，應依業務特性實需，適時增訂檢查項目，驗證重點項目為何？", a: "（1）預財組人員職務異動業務移交清點。（2）印鑑設置及保管。（3）支票簽發及支票登記簿登載。（4）會計檔案存管。" },
+    { id: 43, diff: "mid", q: "試問會計日報表編報期限為何？", a: "以截至當日終了時之帳載資料編報之，並應於次一工作天12時前送達單位主官核閱。" },
+    { id: 44, diff: "mid", q: "依國軍各級單位現金會計作業規定，試問墊借款之定義為何？", a: "因業務需要先行墊借之款項或借予業務部門之業務週轉金均屬之。" },
+    { id: 45, diff: "mid", q: "團體獎金之運用範圍為何？試述之。", a: "應置重點於改善官兵福利及增進官兵權益，如個人獎金（品）、餐會、自強活動暨其他屬團體性之支出事項。" },
+    { id: 46, diff: "mid", q: "依據國軍各級單位現金會計作業規定，試問暫收款之定義為何？", a: "凡性質尚未確定之各項待查明、領回轉發、待解繳及待退還等4類款項。" },
+    { id: 47, diff: "mid", q: "依國軍各級單位現金會計作業規定，試問各種傳票應為下列各款之記載？", a: "（1）年、月、日。（2）會計科目。（3）事由。（4）新臺幣數目。（5）有關之原始憑證種類、張數及其號數、日期。（6）傳票號碼。（7）其他備查要點。" },
+    { id: 48, diff: "mid", q: "各種傳票非經何項人員簽名或蓋章不生效力？", a: "（1）單位主官。（2）業務之主管或主辦人員。（3）主辦會計人員。（4）主辦出納事務人員。（5）製票員。（6）登記員。" },
+    { id: 49, diff: "mid", q: "人事薪給資料查核時機為何？", a: "（1）支薪單位人員異動。（2）支薪單位編制修訂。（3）每半年實施人事薪給資料查核乙次。" },
+    { id: 50, diff: "mid", q: "各機關繳納公用事業費款（如水電費、電信費、瓦斯費等）應取得何種支出憑證？", a: "得以繳費通知單作為支出憑證；如赴公用事業營業處所或代收機構繳納者，並應檢附取得之繳款證明。" },
+    { id: 51, diff: "mid", q: "基層單位財務業務集中後，如何辦理經費結報？", a: "案件結報應檢附原始憑證等資料會辦預財組審核，並簽奉業務集中單位主官（或授權人）核定後，案移預財組辦理付款作業。" },
+    { id: 52, diff: "mid", q: "各級正（副）主官移交後，前任主官行政費餘額是否追減報繳？", a: "應於任期內辦理行政費支用，倘未支畢餘額不得納入移交，應辦理繳回。" },
+    { id: 53, diff: "mid", q: "各級單位慰問金經費來源如何？", a: "各軍種司令部、指揮部（含）以上單位辦理慰問工作，其所需經費，由「政戰綜合作業」、「其他作業」及「動員整備」等科目項下支應。" },
+    { id: 54, diff: "mid", q: "「國軍人員申領各項補助費精進計畫」之目的為何？", a: "簡化基層業務負荷，落實有感服務，使國軍人員於戶政事務所辦理結婚出生或死亡登記時，即可同步通報，以利快速獲撥補助款項。" },
+    { id: 55, diff: "mid", q: "國軍人員留薪範圍及方式？", a: "（1）範圍：薪俸、考績獎金及年終獎金。（2）方式：薪俸區分定額轉存、餘額轉存及全額轉存；考績獎金及年終獎金區分全額轉存或不轉存。" },
+    { id: 56, diff: "mid", q: "試述申領結婚補助費應檢附之要件為何？", a: "（1）戶口名簿影本、結婚證書。如新式戶口名簿影本或戶籍謄本得確認親屬關係、事實發生日期、法律效果，得替代上開證明文件。（2）結婚補助費證明冊。" },
+    { id: 57, diff: "mid", q: "依國軍官兵止伙作業規定，申請止伙作業程序？", a: "應於事由起始日3日前填具止伙申請單，向所屬單位提出申請，遇不可抗拒因素得檢附相關證明（派令、電話紀錄等）辦理。" },
+    { id: 58, diff: "mid", q: "國軍官兵由財務單位發放之各項加給主要區分幾種類型？", a: "（1）專業加給。（2）主管職務加給。（3）志願役加給。（4）勤務性加給。（5）地域加給。（6）戰鬥加給。" },
+    { id: 59, diff: "mid", q: "勤務性個別給與支領應具備之基本條件為何？", a: "（1）實際佔該項編制職缺。（2）具有該項勤務專長（技能）者。（3）實際服行該項勤務者。" },
+    { id: 60, diff: "mid", q: "依國軍勞軍款處理作業規定第3及4條，貴單位為營級單位，如接獲勞軍款8萬元，請問應於收款後幾日內由何部門完成收支計畫編製，呈報何權責單位核定？", a: "應於收款後10個工作日內由政戰部門編製收支計畫，呈報上一級單位主辦主計軍官副署後，由所隸預算支用單位主官核定。" },
+    { id: 61, diff: "mid", q: "依政府支出憑證處理要點第9點，各機關依法提存之款項，其支出憑證為何？", a: "各機關依法提存之款項，應取得國庫存款收款書及由經手人簽名之提存書影本，作為支出憑證。" },
+    { id: 62, diff: "mid", q: "依軍費預算執行及支付結報規定第8條第3項，自辦理暫付之日起，最遲不得超過幾天？", a: "除外購案預付款等無法取得憑證結報者外，最遲不得超過45天（含例假日）。" },
+    { id: 63, diff: "mid", q: "依會計法第22條，會計報告分為那2項？", a: "（1）靜態之會計報告：表示一定日期之財務狀況。（2）動態之會計報告：表示一定期間內之財務變動經過情形。" },
+    { id: 64, diff: "mid", q: "依軍費預算執行及支付結報規定第3項，軍費預算之執行及支付結報區分哪幾類？", a: "（1）分配預算編造。（2）預算分配。（3）預算簽證支用。（4）費款支付。（5）憑證存管。（6）預算保留作業。" },
+    { id: 65, diff: "mid", q: "依決算法第3條，試問政府之決算有哪5種？", a: "總決算、單位決算、單位決算之分決算、附屬單位決算、附屬單位決算之分決算。" },
+    { id: 66, diff: "mid", q: "依國軍各級單位現金會計作業規定第71條，試問單位每月各項傳票及原始憑證應如何處置？", a: "應按聯別、傳票種類、日期及編號順序分月裝訂成冊，另加封面，封面上填記年度、月份、傳票張數及起訖號數，妥慎保管備核。" },
+    { id: 67, diff: "mid", q: "基層單位財務業務集中後，預財士可否擔任採購案承辦人員？", a: "因預財士為單位監辦人員，故不得為購案承辦人員，惟可協助審查購辦案件程序。" },
+    { id: 68, diff: "mid", q: "統一發票是否須加蓋負責人私章？", a: "依政府支出憑證處理要點，並未要求統一發票應載明負責人之姓名。" },
+    { id: 69, diff: "mid", q: "代收款之收付保管原則為何？", a: "均應依「統收統支」原則由財務中心所屬地區財務單位統一辦理，各單位不得自為現金收支，或截留坐支。" },
+    { id: 70, diff: "mid", q: "試述部隊特別補助之支用規定？", a: "單位主官為加強領導統御，發揮即時犒賞部屬之獎勵（含獎金、獎品）及購置慰問品等所需費用。" },
+    { id: 71, diff: "mid", q: "試述炊具費其之支用規定？", a: "專供廚房、餐廳、消耗（零星）性用品補充及清潔用品、引火材料等費用，如有結餘，仍應用於副食。" },
+    { id: 72, diff: "mid", q: "常備兵役軍事訓練人員之退伍旅費支給標準為何？", a: "退員戶籍地址距離單位所在地未達60公里者，報支200元，60公里以上者，報支600元。" },
+
+    // 🔴 難 (18題, id: 73~90)
+    { id: 73, diff: "hard", q: "依各級單位對經管財務行政人員實施內部控制之「自我檢查」作業範圍？", a: "（1）預算執行。（2）會計處理。（3）現金收支。（4）財產保管。（5）採購及處分財物。（6）領回轉發案件（含營外欠款情形）。（7）補助費跨機關通報案件。（8）主計部門財務輔檢督導情形。（9）臨時交辦及其他重要事項。" },
+    { id: 74, diff: "hard", q: "試述國防部所屬各級單位主官及副主官特別費使用範圍？", a: "（1）贈送婚喪喜慶之禮金、奠儀、禮品、花籃（圈）、喜幛、輓聯、中堂及匾額等支出。（2）對本單位及所屬單位人員以實物之獎（犒）賞、慰勞（問）及餐敘等支出。（3）對外部單位（即本單位及所屬單位以外之單位）、民間團體與有關人士等之招待、餽（捐）贈及慰問等支出。" },
+    { id: 75, diff: "hard", q: "依國防部所屬單位歲入預算及預算外庫款收退作業規定，各單位依法應解繳國庫之款項，其範圍包括？", a: "（一）歲入預算：1.罰款及賠償收入。2.規費收入。3.財產收入。4.營業盈餘及事業收入。5.其他收入。（二）預算外庫款：1.剔除經費。2.以前年度減列經費。3.以前年度押金收回。4.其他以前年度經費賸餘。" },
+    { id: 76, diff: "hard", q: "基層單位財務業務集中優點為何？", a: "（1）減少國庫支票開立次數。（2）降低洽公次數。（3）提升預財士官編階，提高留營意願。（4）憑證集中保管、降低遺失風險。（5）人員集中編設可互為代理，良性互動教學相長。（6）連級會計月報由上級代編。" },
+    { id: 77, diff: "hard", q: "試述申領生育補助費應具備之申領資格？", a: "（1）志願役官兵及文職人員，申領者以配偶或本人分娩或早產者為限。（2）因早產申請生育補助需妊娠週數大於20週，小於37週生產。（3）本人或配偶分娩或早產為雙生以上者，另增給生育補助，雙胞胎者，給與二個月本俸；三胞胎者，給與四個月本俸；四胞胎以上者類推之。" },
+    { id: 78, diff: "hard", q: "國軍計畫預算制度之目的？", a: "（1）密切配合國家目標。（2）明確設計國軍兵力整建目標。（3）研究分析有關備選方案，貫徹政策節約。（4）顯示未來5年之全般需求，分期貫徹執行。（5）確保戰略目標與資源相結合，並經濟有效運用國家資源。" },
+    { id: 79, diff: "hard", q: "依國軍各級單位主計及出納人員交代作業規定，經管財務人員交接事項內容應包含哪些？", a: "（1）會計業務：經管之現金收支登記簿、各帳戶餘額明細資料、會計檔案、會計業務用品、會計法令規章、會計類待辦事項及其他有關會計業務應交代事項等。（2）出納業務：經管之各項現金、票據、銀行存款等及銀行存款調節表、各項原始憑證及支票、領款收據（存根）、出納業務用品、出納法令規章、出納類待辦事項及其他有關出納業務應交代事項等。" },
+    { id: 80, diff: "hard", q: "依國軍各單位經管款項存款帳戶管制規定第16條，試述國庫支票作廢之處理程序？", a: "應予打洞註銷，在票面加蓋作廢戳記後，黏貼於原支票存根，並記入支票登記簿備查；國庫支票如係票面記載錯誤而致作廢時，應將票面記載之文字及金額劃二道紅線予以註銷，並塗銷已蓋妥之印鑑章，將支票號碼剪下貼附於支票領取證背面繳回，將作廢支票黏貼於原支票存根存查，並於支票登記簿登錄備查。" },
+    { id: 81, diff: "hard", q: "依國軍各單位經管款項存款帳戶管制規定，試述單位承辦簽發國庫專戶存款支票人員調動時之處理程序？", a: "（1）將經管支票存根、作廢支票、未簽發之空白支票及支票領取證等列入移交。（2）辦理國庫專戶印鑑更換（逕向國庫索取「國庫更換印鑑申請書」及新印鑑卡）。（3）向國庫申請存款餘額證明書。" },
+    { id: 82, diff: "hard", q: "依「國軍國內出差旅費報支規定」可申領旅費項目為何？並簡述之", a: "（1）交通費：包括出差行程中必須搭乘之飛機、高鐵、船舶、火車、汽車、捷運、公共自行車等費用，均覈實報支；單位專備交通工具或出差人員領有免費票或搭乘便車者，不得報支交通費。搭乘飛機、高鐵、座（艙）位有分等之船舶、火車者，報支交通費時，應檢附票根或購票證明文件。駕駛自用汽車、機車出差者，其交通費得按必要路程之公里數（尾數不足一公里者，進位為一公里），汽車以每公里新臺幣三元、機車二元報支。（2）住宿費：出差地點距離單位所在地60公里以上，且有住宿事實者，得在依數額表所列基準內（平日：3,500元；假日：4,500元），檢據核實報支。（3）雜費：依實際行程達4小時以上得報支400元；未滿4小時者，得報支200元，不含提前出發及延後返回所需路程時間。" },
+    { id: 83, diff: "hard", q: "依國軍各單位經管款項存款帳戶管制規定第4條，試述單位撤銷或費款清結時之作業程序？", a: "（1）結清存款帳戶。（2）連同未用剩餘空白國庫支票（含作廢支票）及支票領取證，加蓋作廢章後，應填具「國庫機關專戶存款銷戶通知書」（逕向國庫索取），加蓋全部印鑑章及正式印信，一併送交國庫銷戶。（3）單位銷戶完成取具「國庫帳戶銷戶回單」，持向財務單位登記單位國庫專戶基本資料異動。" },
+    { id: 84, diff: "hard", q: "國軍各級單位強化墊借款管制作業原則為何？", a: "妥適律定核判層級，依作業實需及財務業務集中現況妥適律定，避免因程序繁瑣影響承辦人員墊借意願，支出事項金額為五千元（不含）以上者，應優先以墊借方式辦理，若無墊借需求，須於申購時註記。" },
+    { id: 85, diff: "hard", q: "收領款收據因開具錯誤或收款事由消滅而作廢者，應如何處理？", a: "（1）收領款收據因開具錯誤或收款事由消滅而作廢者，須於系統確實查填作廢原因。（2）由原開據單位收回後加蓋作廢章（一式二份）。（3）併同當月份會計報告妥存備查。" },
+    { id: 86, diff: "hard", q: "基層單位簽發國庫支票時，應設置何種簿冊，其注意事項為何？", a: "支票簽發應設置「支票登記及現金檢查紀錄簿」，應由出納人員依使用情形逐筆登載於登記簿內（支票作廢亦應登載），並由各級印鑑保管人員於用印時，核對支票號碼、金額及受款人等資訊正確無誤後，於登記簿內簽名負責。" },
+    { id: 87, diff: "hard", q: "依國軍志願役軍官士官及志願士兵考績作業規定第117條規定，年度考績獎金核發標準為何？", a: "核發基準：依考績核定當月（1月1日）所任職務之俸給總額（薪俸、專業加給及主管職務加給）按下列標準發給：（1）績等「甲等」以上者：發給一個月俸給總額；已晉至本階最高俸級者（含志願役上兵），發給二個月俸給總額。（2）績等「乙上」者：發給半個月俸給總額；已晉至本階最高俸級者（含志願役上兵），發給一個半月俸給總額。（3）績等「乙等」以下者：不核發考績獎金。" },
+    { id: 88, diff: "hard", q: "依據審計法第2條規定，試問審計職權為何？", a: "（1）監督預算之執行。（2）核定收支命令。（3）審核財務收支，審定決算。（4）稽察財物及財政上之不法或不忠於職務之行為。（5）考核財務效能。（6）核定財務責任。（7）其他依法律應行辦理之審計事項。" },
+    { id: 89, diff: "hard", q: "機關採購多項財物或勞務而取得廠商提供固定金額折扣，是否須將該金額平均分攤於普通收據或統一發票各項目？", a: "機關取得支出憑證，係為證明支付事實，倘廠商提供折讓未明確歸屬任一項目，其開立普通收據或統一發票以總額減項方式記明，亦可證明支付事實，無須將金額平均分攤於各項目。" },
+    { id: 90, diff: "hard", q: "依國軍各單位經管款項存款帳戶管制規定第8條，國庫專戶存款支票印鑑必須有哪些人員蓋章，並負連帶責任？", a: "（1）單位主官或其職務代理人。（2）主辦主計（會計）人員或其職務代理人（非預算支用單位原則上以單位輔導長兼辦，無輔導長編制則由主官指派適合職務代理人兼辦）。（3）承辦簽發支票承辦人或其職務代理人。" }
+];
+
+let masteredSet = new Set(JSON.parse(localStorage.getItem('mastered_questions_stage3') || '[]'));
+
+let quizList = [];
+let userAnswers = [];
+let currentIndex = 0;
+let activeMatchRule = 'smart';
+let isQuizActive = false;
+let currentBankFilter = 'all';
+
+function saveMastered() {
+    localStorage.setItem('mastered_questions_stage3', JSON.stringify([...masteredSet]));
+    renderMasteredStat();
+    checkAllMasteredCelebration();
+}
+
+function checkAllMasteredCelebration() {
+    if (masteredSet.size === RAW_QUESTIONS.length) {
+        document.getElementById('modal-all-mastered').classList.remove('hidden');
+    }
+}
+
+function closeMasteredSuccessModal() {
+    document.getElementById('modal-all-mastered').classList.add('hidden');
+    isQuizActive = false;
+    quizList = [];
+    userAnswers = [];
+    currentIndex = 0;
+    
+    document.getElementById('view-quiz').classList.add('hidden');
+    document.getElementById('view-mastered').classList.add('hidden');
+    document.getElementById('view-result').classList.add('hidden');
+    document.getElementById('view-setup').classList.remove('hidden');
+    
+    renderMasteredStat();
+    handleModeChange();
+    renderPauseBanner();
+}
+
+function renderMasteredStat() {
+    const el = document.getElementById('mastered-stat-text');
+    if (el) el.textContent = `已標記熟記：${masteredSet.size} 題 / 共 ${RAW_QUESTIONS.length} 題`;
+    
+    const unmasteredTotal = RAW_QUESTIONS.length - masteredSet.size;
+    const labelCount = document.getElementById('label-count');
+    const inputCount = document.getElementById('input-count');
+    if (labelCount && inputCount) {
+        labelCount.textContent = `本次測驗題數（排除已熟記後共 ${unmasteredTotal} 題）：`;
+        inputCount.max = unmasteredTotal;
+        if (parseInt(inputCount.value, 10) > unmasteredTotal) {
+            inputCount.value = Math.max(1, unmasteredTotal);
+        }
+    }
+}
+
+function resetMastered() {
+    if (confirm("確定要重設所有已熟記的題目標記嗎？")) {
+        masteredSet.clear();
+        saveMastered();
+        if (!document.getElementById('view-mastered').classList.contains('hidden')) {
+            renderMasteredList();
+        }
+    }
+}
+
+function toggleMastered(isChecked) {
+    if (!quizList[currentIndex]) return;
+    const qId = quizList[currentIndex].id;
+    if (isChecked) {
+        masteredSet.add(qId);
+    } else {
+        masteredSet.delete(qId);
+    }
+    saveMastered();
+    const skipBtn = document.getElementById('btn-skip');
+    const record = userAnswers[currentIndex];
+    if (isChecked && (!record || !record.isSubmitted)) {
+        skipBtn.classList.remove('hidden');
+    } else {
+        skipBtn.classList.add('hidden');
+    }
+}
+
+function toggleMasteredFromBank(qId, isChecked) {
+    if (isChecked) {
+        masteredSet.add(qId);
+    } else {
+        masteredSet.delete(qId);
+    }
+    saveMastered();
+    renderMasteredList();
+}
+
+function switchBankFilter(filter) {
+    currentBankFilter = filter;
+    document.getElementById('tab-all').className = `filter-tab ${filter === 'all' ? 'active' : ''}`;
+    document.getElementById('tab-unmastered').className = `filter-tab ${filter === 'unmastered' ? 'active' : ''}`;
+    document.getElementById('tab-mastered').className = `filter-tab ${filter === 'mastered' ? 'active' : ''}`;
+    renderMasteredList();
+}
+
+function showMasteredList() {
+    document.getElementById('view-setup').classList.add('hidden');
+    document.getElementById('view-quiz').classList.add('hidden');
+    document.getElementById('view-result').classList.add('hidden');
+    document.getElementById('view-mastered').classList.remove('hidden');
+    renderMasteredList();
+}
+
+function hideMasteredList() {
+    document.getElementById('view-mastered').classList.add('hidden');
+    document.getElementById('view-setup').classList.remove('hidden');
+    handleModeChange();
+    renderMasteredStat();
+    renderPauseBanner();
+}
+
+function renderMasteredList() {
+    const container = document.getElementById('mastered-list-container');
+    
+    let displayList = RAW_QUESTIONS;
+    if (currentBankFilter === 'mastered') {
+        displayList = RAW_QUESTIONS.filter(q => masteredSet.has(q.id));
+    } else if (currentBankFilter === 'unmastered') {
+        displayList = RAW_QUESTIONS.filter(q => !masteredSet.has(q.id));
+    }
+
+    document.getElementById('tab-all').textContent = `全部 (90)`;
+    document.getElementById('tab-unmastered').textContent = `僅未熟記 (${90 - masteredSet.size})`;
+    document.getElementById('tab-mastered').textContent = `僅已熟記 (${masteredSet.size})`;
+
+    if (displayList.length === 0) {
+        container.innerHTML = `<div class="empty-state">目前此篩選條件下沒有任何題目！</div>`;
+        return;
+    }
+
+    const diffMap = {
+        easy: { label: "易", class: "diff-tag-easy" },
+        mid: { label: "中", class: "diff-tag-mid" },
+        hard: { label: "難", class: "diff-tag-hard" }
+    };
+
+    container.innerHTML = displayList.map(item => {
+        const isM = masteredSet.has(item.id);
+        return `
+            <div class="mastered-item-card ${isM ? 'is-mastered' : ''}">
+                <div class="mastered-item-header">
+                    <div>
+                        <span class="diff-tag ${diffMap[item.diff].class}">${diffMap[item.diff].label}</span>
+                        <strong style="margin-left: 0.35rem; font-size: 0.9rem; color: var(--text-muted);">題號 #${item.id}</strong>
+                    </div>
+                    <label class="mastered-toggle" style="font-size: 0.85rem; color: ${isM ? 'var(--primary)' : 'var(--text-muted)'}; font-weight: ${isM ? '600' : 'normal'};">
+                        <input type="checkbox" ${isM ? 'checked' : ''} onchange="toggleMasteredFromBank(${item.id}, this.checked)">
+                        <span>這題我已背熟</span>
+                    </label>
+                </div>
+                <div class="mastered-item-q">${escapeHtml(item.q)}</div>
+                <div class="mastered-item-a"><strong>標準答案：</strong>${escapeHtml(item.a)}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function pauseAndGoHome() {
+    document.getElementById('view-quiz').classList.add('hidden');
+    document.getElementById('view-setup').classList.remove('hidden');
+    renderPauseBanner();
+    renderMasteredStat();
+}
+
+function renderPauseBanner() {
+    const banner = document.getElementById('panel-paused-quiz');
+    if (isQuizActive && quizList.length > 0) {
+        const desc = document.getElementById('pause-status-desc');
+        const ruleText = activeMatchRule === 'exact' ? '嚴格模式' : '寬鬆模式';
+        const doneCount = userAnswers.filter(a => a && a.isSubmitted).length;
+        const currentCorrect = userAnswers.filter(a => a && a.isSubmitted && a.isCorrect).length;
+        desc.textContent = `進行中進度：當前第 ${currentIndex + 1} 題 / 共 ${quizList.length} 題（已作答 ${doneCount} 題，答對 ${currentCorrect} 題） ｜ 判定方式：${ruleText}`;
+        banner.classList.remove('hidden');
+    } else {
+        banner.classList.add('hidden');
+    }
+}
+
+function resumeQuiz() {
+    if (!isQuizActive || quizList.length === 0) return;
+    document.getElementById('view-setup').classList.add('hidden');
+    document.getElementById('view-quiz').classList.remove('hidden');
+    showQuestion();
+}
+
+function discardQuiz() {
+    if (confirm("確定要放棄當前的測驗進度嗎？")) {
+        isQuizActive = false;
+        quizList = [];
+        userAnswers = [];
+        currentIndex = 0;
+        renderPauseBanner();
+    }
+}
+
+function startNewQuizClick() {
+    if (isQuizActive) {
+        if (!confirm("目前有尚未完成的測驗進度，開始新測驗將覆蓋當前進度，確定開始嗎？")) {
+            return;
+        }
+    }
+    startQuiz();
+}
+
+function cleanSmartText(s) {
+    return s ? s.replace(/[\s\(\)（）\.,，。、:：;；—\-_【】「」『』]/g, '')
+                .replace(/[0-9０-９]/g, '')
+                .toLowerCase()
+                .trim() : '';
+}
+
+function normalizeExactText(s) {
+    if (!s) return '';
+    return s.replace(/\s+/g, '')
+            .replace(/[（\(\[\{【]/g, '（')
+            .replace(/[）\)\]\}】]/g, '）')
+            .replace(/[,，]/g, '，')
+            .replace(/[.。]/g, '。')
+            .replace(/[:：]/g, '：')
+            .replace(/[;；]/g, '；')
+            .replace(/[、]/g, '、')
+            .replace(/[—\-_]/g, '—')
+            .replace(/[０-９]/g, m => String.fromCharCode(m.charCodeAt(0) - 0xFEE0))
+            .trim();
+}
+
+function extractItems(s) {
+    if (!s) return [];
+    return s.split(/(?:[（\(]?\s*\d+\s*[）\.\、\)]|\n+)/)
+            .map(item => cleanSmartText(item))
+            .filter(item => item.length > 0);
+}
+
+function checkSmartMatch(userRaw, standardRaw) {
+    const cleanU = cleanSmartText(userRaw);
+    const cleanS = cleanSmartText(standardRaw);
+    if (!cleanU) return false;
+    if (cleanU === cleanS) return true;
+
+    const standardItems = extractItems(standardRaw);
+    if (standardItems.length > 1) {
+        let remainingUserText = cleanU;
+        let allMatched = true;
+
+        for (const item of standardItems) {
+            const idx = remainingUserText.indexOf(item);
+            if (idx === -1) {
+                allMatched = false;
+                break;
+            }
+            remainingUserText = remainingUserText.slice(0, idx) + remainingUserText.slice(idx + item.length);
+        }
+
+        if (allMatched && remainingUserText.length <= 2) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function checkExactMatch(userRaw, standardRaw) {
+    const normU = normalizeExactText(userRaw);
+    const normS = normalizeExactText(standardRaw);
+    return (normU.length > 0 && normU === normS);
+}
+
+function handleModeChange() {
+    const mode = document.getElementById('select-mode').value;
+    const pRatio = document.getElementById('panel-ratio');
+    const pCount = document.getElementById('panel-count');
+    const pCustom = document.getElementById('panel-custom');
+
+    pRatio.classList.add('hidden');
+    pCount.classList.add('hidden');
+    pCustom.classList.add('hidden');
+
+    if (mode === 'ratio') {
+        pRatio.classList.remove('hidden');
+        updateTotalCount();
+    } else if (mode === 'all') {
+        pCount.classList.remove('hidden');
+        renderMasteredStat();
+    } else if (mode === 'custom') {
+        pCustom.classList.remove('hidden');
+    }
+}
+
+function updateTotalCount() {
+    const easy = parseInt(document.getElementById('input-easy').value, 10) || 0;
+    const mid = parseInt(document.getElementById('input-mid').value, 10) || 0;
+    const hard = parseInt(document.getElementById('input-hard').value, 10) || 0;
+    document.getElementById('ratio-total-hint').textContent = `本次預計測驗：${easy + mid + hard} 題`;
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function getRandomSubarray(arr, size) {
+    const shuffled = [...arr].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, size);
+}
+
+function startQuiz() {
+    activeMatchRule = document.getElementById('select-match-rule').value;
+    const mode = document.getElementById('select-mode').value;
+    let selected = [];
+
+    if (mode === 'ratio') {
+        const easyCount = Math.min(Math.max(0, parseInt(document.getElementById('input-easy').value, 10) || 0), 36);
+        const midCount = Math.min(Math.max(0, parseInt(document.getElementById('input-mid').value, 10) || 0), 36);
+        const hardCount = Math.min(Math.max(0, parseInt(document.getElementById('input-hard').value, 10) || 0), 18);
+
+        const easyPool = RAW_QUESTIONS.filter(x => x.diff === 'easy');
+        const midPool = RAW_QUESTIONS.filter(x => x.diff === 'mid');
+        const hardPool = RAW_QUESTIONS.filter(x => x.diff === 'hard');
+
+        selected = [
+            ...getRandomSubarray(easyPool, easyCount),
+            ...getRandomSubarray(midPool, midCount),
+            ...getRandomSubarray(hardPool, hardCount)
+        ];
+    } else if (mode === 'all') {
+        const unmasteredPool = RAW_QUESTIONS.filter(x => !masteredSet.has(x.id));
+        if (unmasteredPool.length === 0) {
+            alert("🎉 所有題目均已標記為熟記！請先清空或調整熟記名單。");
+            return;
+        }
+        const count = Math.min(Math.max(1, parseInt(document.getElementById('input-count').value, 10) || 1), unmasteredPool.length);
+        selected = getRandomSubarray(unmasteredPool, count);
+    } else if (mode === 'custom') {
+        let start = (parseInt(document.getElementById('custom-start').value, 10) || 1);
+        let end = (parseInt(document.getElementById('custom-end').value, 10) || 90);
+        if (start > end) [start, end] = [end, start];
+        
+        selected = RAW_QUESTIONS.filter(q => q.id >= start && q.id <= end && !masteredSet.has(q.id));
+        if (selected.length === 0) {
+            alert(`題號 ${start} 至 ${end} 區間內的題目已全部標記為熟記！`);
+            return;
+        }
+    }
+
+    if (selected.length === 0) {
+        alert("所選設定未包含任何題目！");
+        return;
+    }
+
+    initQuizSession(selected);
+}
+
+function initQuizSession(questions) {
+    quizList = questions.sort(() => 0.5 - Math.random());
+    userAnswers = new Array(quizList.length).fill(null);
+    currentIndex = 0;
+    isQuizActive = true;
+
+    document.getElementById('view-setup').classList.add('hidden');
+    document.getElementById('view-result').classList.add('hidden');
+    document.getElementById('view-mastered').classList.add('hidden');
+    document.getElementById('view-quiz').classList.remove('hidden');
+
+    showQuestion();
+}
+
+function saveCurrentDraft(val) {
+    if (!userAnswers[currentIndex]) {
+        userAnswers[currentIndex] = { userAnswer: val, isSubmitted: false, isCorrect: false, feedbackHtml: '', isSkipped: false };
+    } else {
+        userAnswers[currentIndex].userAnswer = val;
+    }
+}
+
+function showQuestion() {
+    const item = quizList[currentIndex];
+    const record = userAnswers[currentIndex];
+
+    document.getElementById('quiz-progress').textContent = `第 ${currentIndex + 1} 題 / 共 ${quizList.length} 題`;
+    document.getElementById('quiz-question').textContent = item.q;
+    
+    const btnPrev = document.getElementById('btn-prev');
+    btnPrev.disabled = (currentIndex === 0);
+
+    const isMastered = masteredSet.has(item.id);
+    const chk = document.getElementById('chk-mastered');
+    chk.checked = isMastered;
+
+    const skipBtn = document.getElementById('btn-skip');
+    const ansArea = document.getElementById('quiz-answer');
+    const submitBtn = document.getElementById('btn-submit');
+    const nextBtn = document.getElementById('btn-next');
+    const feedback = document.getElementById('quiz-feedback');
+
+    if (activeMatchRule === 'exact') {
+        ansArea.placeholder = "請輸入完整標準答案（一字不漏模式：須包含編號、順序與標點，全半形皆可）...";
+    } else {
+        ansArea.placeholder = "請輸入答案（寬鬆模式：免標點、免編號、順序不拘皆可自動判定）...";
+    }
+
+    if (record && record.isSubmitted) {
+        ansArea.value = record.userAnswer || '';
+        ansArea.disabled = true;
+        submitBtn.classList.add('hidden');
+        skipBtn.classList.add('hidden');
+        nextBtn.classList.remove('hidden');
+        
+        feedback.className = `feedback ${record.isCorrect ? 'correct' : 'wrong'}`;
+        feedback.innerHTML = record.feedbackHtml;
+        feedback.classList.remove('hidden');
+    } else {
+        ansArea.value = (record && record.userAnswer) ? record.userAnswer : '';
+        ansArea.disabled = false;
+        submitBtn.classList.remove('hidden');
+        nextBtn.classList.add('hidden');
+        feedback.className = 'feedback hidden';
+        feedback.innerHTML = '';
+        
+        if (isMastered) {
+            skipBtn.classList.remove('hidden');
+        } else {
+            skipBtn.classList.add('hidden');
+        }
+        ansArea.focus();
+    }
+}
+
+function prevQuestion() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        showQuestion();
+    }
+}
+
+function skipMasteredQuestion() {
+    userAnswers[currentIndex] = {
+        userAnswer: '(已熟記跳過)',
+        isSubmitted: true,
+        isCorrect: true,
+        isSkipped: true,
+        feedbackHtml: `<div class="feedback-title">⏭️ 此題已標記熟記並直接略過</div>`
+    };
+    nextQuestion();
+}
+
+function computeDiff(expected, actual) {
+    const m = expected.length, n = actual.length;
+    const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (expected[i - 1] === actual[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;
+            else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+        }
+    }
+
+    let i = m, j = n;
+    let standardDiff = [];
+    let userDiff = [];
+
+    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && expected[i - 1] === actual[j - 1]) {
+            standardDiff.unshift(escapeHtml(expected[i - 1]));
+            userDiff.unshift(escapeHtml(actual[j - 1]));
+            i--; j--;
+        } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+            userDiff.unshift(`<span class="diff-del" title="多打/打錯">${escapeHtml(actual[j - 1])}</span>`);
+            j--;
+        } else {
+            standardDiff.unshift(`<span class="diff-ins" title="漏掉/打錯">${escapeHtml(expected[i - 1])}</span>`);
+            i--;
+        }
+    }
+
+    return { standardHtml: standardDiff.join(''), userHtml: userDiff.join('') };
+}
+
+function submitAnswer() {
+    const rawU = document.getElementById('quiz-answer').value;
+    const item = quizList[currentIndex];
+    const rawS = item.a;
+    const feedback = document.getElementById('quiz-feedback');
+    
+    let isCorrect = false;
+    if (activeMatchRule === 'exact') {
+        isCorrect = checkExactMatch(rawU, rawS);
+    } else {
+        isCorrect = checkSmartMatch(rawU, rawS);
+    }
+
+    let feedbackHtmlContent = '';
+
+    if (isCorrect) {
+        feedback.className = 'feedback correct';
+        feedbackHtmlContent = `
+            <div class="feedback-title">✅ 完全正確！${activeMatchRule === 'exact' ? '（一字不漏完全符合）' : '（要點齊全）'}</div>
+            <div style="font-weight: 600; margin-top: 0.5rem;">【標準答案】：</div>
+            <div class="diff-view">${rawS}</div>
+        `;
+    } else {
+        feedback.className = 'feedback wrong';
+        let diff;
+        if (activeMatchRule === 'exact') {
+            diff = computeDiff(normalizeExactText(rawS), normalizeExactText(rawU));
+        } else {
+            diff = computeDiff(cleanSmartText(rawS), cleanSmartText(rawU));
+        }
+
+        feedbackHtmlContent = `
+            <div class="feedback-title">❌ 答案有誤（${activeMatchRule === 'exact' ? '一字不漏比對未完全吻合' : '要點缺漏或不正確'}）</div>
+            <div style="font-weight: 600; margin-top: 0.5rem;">【標準答案】：</div>
+            <div class="diff-view">${rawS}</div>
+            <div style="font-weight: 600; margin-top: 0.5rem;">【缺漏/錯誤比對】：</div>
+            <div class="diff-view">標準要點：${diff.standardHtml}<br>您的作答：${diff.userHtml}</div>
+        `;
+    }
+
+    userAnswers[currentIndex] = {
+        userAnswer: rawU,
+        isSubmitted: true,
+        isCorrect: isCorrect,
+        isSkipped: false,
+        feedbackHtml: feedbackHtmlContent
+    };
+
+    feedback.innerHTML = feedbackHtmlContent;
+    feedback.classList.remove('hidden');
+
+    document.getElementById('quiz-answer').disabled = true;
+    document.getElementById('btn-submit').classList.add('hidden');
+    document.getElementById('btn-skip').classList.add('hidden');
+    document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function nextQuestion() {
+    currentIndex++;
+    if (currentIndex < quizList.length) {
+        showQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    isQuizActive = false;
+    document.getElementById('view-quiz').classList.add('hidden');
+    document.getElementById('view-result').classList.remove('hidden');
+
+    const total = quizList.length;
+    let actualAttempts = 0;
+    let correctCount = 0;
+    let skippedCount = 0;
+
+    userAnswers.forEach((ans) => {
+        if (ans && ans.isSubmitted) {
+            if (ans.isSkipped) {
+                skippedCount++;
+            } else {
+                actualAttempts++;
+                if (ans.isCorrect) correctCount++;
+            }
+        }
+    });
+
+    const rate = actualAttempts > 0 ? Math.round((correctCount / actualAttempts) * 100) : 0;
+    
+    document.getElementById('res-rate').textContent = `${rate}%`;
+    document.getElementById('res-detail').innerHTML = `
+        實際作答 <strong>${actualAttempts}</strong> 題${skippedCount > 0 ? ` ｜ 熟記跳過 <strong>${skippedCount}</strong> 題` : ''}<br>
+        答對 <strong>${correctCount}</strong> 題 ｜ 答錯 <strong>${actualAttempts - correctCount}</strong> 題<br>
+        <span style="font-size:0.85rem; color: var(--text-muted);">（判定規則：${activeMatchRule === 'exact' ? '嚴格模式' : '寬鬆模式'}）</span>
+    `;
+
+    const unmasteredWrong = [];
+    userAnswers.forEach((ans, idx) => {
+        if (ans && ans.isSubmitted && !ans.isCorrect && !ans.isSkipped) {
+            const qObj = quizList[idx];
+            if (!masteredSet.has(qObj.id)) {
+                unmasteredWrong.push(qObj);
+            }
+        }
+    });
+
+    const retryBtn = document.getElementById('btn-retry-unmastered');
+    if (unmasteredWrong.length > 0) {
+        retryBtn.textContent = `複習本次錯題（共 ${unmasteredWrong.length} 題未熟記）`;
+        retryBtn.classList.remove('hidden');
+        retryBtn.onclick = () => initQuizSession(unmasteredWrong);
+    } else {
+        retryBtn.classList.add('hidden');
+    }
+}
+
+function restartQuiz() {
+    isQuizActive = false;
+    renderMasteredStat();
+    renderPauseBanner();
+    document.getElementById('view-result').classList.add('hidden');
+    document.getElementById('view-setup').classList.remove('hidden');
+    handleModeChange();
+}
+
+renderMasteredStat();
+handleModeChange();
+renderPauseBanner();
 </script>
 </body>
 </html>
