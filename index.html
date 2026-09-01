@@ -1602,6 +1602,9 @@ function renderCardContentWithoutReset() {
     cardLastPositions[currentCardScope] = cardIndex;
     localStorage.setItem('card_last_positions_stage3', JSON.stringify(cardLastPositions));
 
+    const inner = document.getElementById('flashcard-inner');
+    if (inner) inner.classList.remove('is-flipped');
+
     document.getElementById('srs-box').classList.add('hidden');
     document.getElementById('card-progress').textContent = `📝 題目 (${cardIndex + 1}/${cardList.length}) (#${item.id})`;
 
@@ -1617,6 +1620,13 @@ function renderCardContentWithoutReset() {
         document.getElementById('card-front-body').textContent = item.q;
         document.getElementById('card-back-body').textContent = item.a;
         document.getElementById('card-back-title').textContent = "💡 標準答案";
+    }
+
+    const diffMap = { easy: { label: "易", class: "diff-tag-easy" }, mid: { label: "中", class: "diff-tag-mid" }, hard: { label: "難", class: "diff-tag-hard" } };
+    const tag = document.getElementById('card-diff-tag');
+    if (tag) {
+        tag.className = `diff-tag ${diffMap[item.diff].class}`;
+        tag.textContent = `${diffMap[item.diff].label} #${item.id}`;
     }
 
     const chk = document.getElementById('chk-card-mastered');
